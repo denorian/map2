@@ -19,13 +19,15 @@ public class First {
 	public static int getHeight(double latitude, double longitude) {
 		String reponse = SimpleHttpClient.get(getQuery(latitude, longitude));
 		String[] temp = reponse.trim().split(" ");
-		if (temp.length == 3) {
+		if (temp.length > 2) {
 			int height = Integer.parseInt(temp[2]);
 			if (height > ERROR_VALUE) {
 				return height;
 			}
 		} else {
+			System.out.println("Query" + getQuery(latitude, longitude));
 			System.out.println("reponse" + reponse);
+			//System.exit(999);
 		}
 		return ERROR_VALUE;
 	}

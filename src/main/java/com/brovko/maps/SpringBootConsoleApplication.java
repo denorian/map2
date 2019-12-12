@@ -1,6 +1,7 @@
 package com.brovko.maps;
 
 import com.brovko.maps.component.Coordinate;
+import com.brovko.maps.component.Parser;
 import com.brovko.maps.component.Tile;
 import com.brovko.maps.repositories.HeightRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,21 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		
 		long start2 = System.currentTimeMillis();
+		
+		Parser parser = new Parser(heightRepo,0.1, 2);
+		parser.run();
+		
+		System.out.println(System.currentTimeMillis() - start + " ms");
+		System.out.println(System.currentTimeMillis() - start2 + " ms");
+		
+		exit(0);
+	}
+	
+	public void run2(String... args) throws Exception {
+		
+		long start2 = System.currentTimeMillis();
 		System.out.println(heightRepo);
-		Coordinate coordinateStart = new Coordinate(44.398168, 38.513053);
+		Coordinate coordinateStart = new Coordinate(44.408168, 38.503053);
 		Coordinate coordinateEnd = new Coordinate(44.351066, 38.559055);
 		
 		Tile tile = new Tile(coordinateStart, coordinateEnd, 4, heightRepo);
@@ -41,10 +55,6 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 		System.out.println(System.currentTimeMillis() - start + " ms");
 		System.out.println(System.currentTimeMillis() - start2 + " ms");
 		
-		/*HeightComponent heightComponent = new HeightComponent(heightRepo);
-		for (double i = 33; i < 34; i += 0.0001) {
-			System.out.println(heightComponent.getHeight(i,84.211));
-		}*/
 		exit(0);
 	}
 }

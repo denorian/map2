@@ -25,9 +25,6 @@ public class Tile {
 	private Coordinate coordinateStart;
 	private Coordinate coordinateEnd;
 	
-	public Tile() {
-	}
-	
 	public Tile(Coordinate coordinateStart, Coordinate coordinateEnd) {
 		this.coordinateStart = coordinateStart;
 		this.coordinateEnd = coordinateEnd;
@@ -81,7 +78,7 @@ public class Tile {
 					Thread thread = new HeightWorkerThread(coordinate.getLatitude(), coordinate.getLongitude(), heightLinkedList, heightRepo);
 					thread.setPriority(Thread.MAX_PRIORITY);
 					thread.start();
-					Thread.sleep(20);
+					Thread.sleep(25);
 					threadList.add(thread);
 				} catch (Exception e) {
 					e.printStackTrace();
