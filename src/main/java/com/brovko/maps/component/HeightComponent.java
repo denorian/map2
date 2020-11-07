@@ -18,16 +18,15 @@ public class HeightComponent {
 		this.heightRepo = heightRepo;
 	}
 	
-	public Height getHeight(double latitude, double longitude) {
+	public Height getHeight(float latitude, float longitude) {
 		Height height;
 		
 		try {
 			List<Height> heights = heightRepo.fetchHeight(latitude, longitude);
 			height = heights.get(0);
 		} catch (Exception e) {
-			int heightElevation = First.getHeight(latitude, longitude);
+			short heightElevation = (short) First.getHeight(latitude, longitude);
 			height = new Height(latitude, longitude, heightElevation);
-			System.out.println(height);
 			heightRepo.save(height);
 		}
 		

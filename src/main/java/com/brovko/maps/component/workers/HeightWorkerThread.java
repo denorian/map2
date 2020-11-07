@@ -9,12 +9,12 @@ import java.util.LinkedList;
 
 public class HeightWorkerThread extends Thread {
 	
-	private double latitude;
-	private double longitude;
+	private float latitude;
+	private float longitude;
 	private LinkedList<Height> list;
 	private HeightRepo heightRepo;
 	
-	public HeightWorkerThread(double latitude, double longitude, LinkedList<Height> list, HeightRepo heightRepo) {
+	public HeightWorkerThread(float latitude, float longitude, LinkedList<Height> list, HeightRepo heightRepo) {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.list = list;

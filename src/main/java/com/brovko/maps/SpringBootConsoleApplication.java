@@ -32,7 +32,7 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 		
 		long start2 = System.currentTimeMillis();
 		
-		Parser parser = new Parser(heightRepo,0.1, 2);
+		Parser parser = new Parser(heightRepo,0.1f, 2);
 		parser.run();
 		
 		System.out.println(System.currentTimeMillis() - start + " ms");
@@ -45,8 +45,8 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 		
 		long start2 = System.currentTimeMillis();
 		System.out.println(heightRepo);
-		Coordinate coordinateStart = new Coordinate(44.408168, 38.503053);
-		Coordinate coordinateEnd = new Coordinate(44.351066, 38.559055);
+		Coordinate coordinateStart = new Coordinate(44.408168f, 38.503053f);
+		Coordinate coordinateEnd = new Coordinate(44.351066f, 38.559055f);
 		
 		Tile tile = new Tile(coordinateStart, coordinateEnd, 4, heightRepo);
 		tile.drawConsoleMatrix(10);

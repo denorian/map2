@@ -10,17 +10,20 @@ import org.springframework.web.bind.annotation.*;
 public class ConsoleController {
 	@Autowired
 	private HeightRepo heightRepo;
-	
+
 	public void getHeight2(
-			@RequestParam(value = "lon") String longitude,
-			@RequestParam(value = "lat") String latitude,
-			@RequestParam(value = "height") Integer height) {
-		
+		@RequestParam(value = "lon") String longitude,
+		@RequestParam(value = "lat") String latitude,
+		@RequestParam(value = "height") Short height
+	) {
+
 		Height heightModel = new Height(
-				Double.parseDouble(latitude),
-				Double.parseDouble(longitude),
-				height);
+			Float.parseFloat(latitude),
+			Float.parseFloat(longitude),
+			height
+		);
+
 		heightRepo.save(heightModel);
-		
+
 	}
 }

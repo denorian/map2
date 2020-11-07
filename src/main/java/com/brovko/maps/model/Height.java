@@ -1,69 +1,42 @@
 package com.brovko.maps.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
-@DynamicUpdate
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name="height")
+@IdClass(HeightPK.class)
 public class Height {
 	
 	public static final int PRECISION = 4;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name="id")
-	private Long id;
 	@Column(name="latitude")
-	private double latitude;
+	private float latitude;
+
+	@Id
 	@Column(name="longitude")
-	private double longitude;
-	@Column(name="height")
-	private int height;
-	
-	public Height() {
-	}
-	
-	public Height(double latitude, double longitude, int height) {
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.height = height;
-	}
-	
-	public double getLatitude() {
-		return latitude;
-	}
-	
-	public double getLongitude() {
-		return longitude;
-	}
-	
-	public int getHeight() {
-		return height;
-	}
-	
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
-	
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
-	
-	public void setHeight(int height) {
-		this.height = height;
-	}
-	
-	public String getMapKey(){
-		return latitude + "_" + longitude;
-	}
-	
+	private float longitude;
+
+	@Column(name="height", columnDefinition = "SMALLINT")
+	@Type(type = "org.hibernate.type.ShortType")
+	private short height;
+
 	@Override
 	public String toString() {
 		return "Height{" +
-				"id=" + id +
-				", latitude=" + latitude +
+				"latitude=" + latitude +
 				", longitude=" + longitude +
 				", height=" + height +
 				'}';

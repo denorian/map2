@@ -15,8 +15,8 @@ public class SimpleHttpClient {
 			connection = (HttpURLConnection) new URL(url).openConnection();
 			connection.setRequestMethod("GET");
 			connection.setUseCaches(false);
-			connection.setConnectTimeout(50000);
-			connection.setReadTimeout(50000);
+			connection.setConnectTimeout(60000);
+			connection.setReadTimeout(60000);
 			connection.connect();
 			
 			StringBuilder stringBuilder = new StringBuilder();

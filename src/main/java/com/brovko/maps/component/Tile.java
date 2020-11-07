@@ -20,7 +20,7 @@ public class Tile {
 	public static int externalPrecision;
 	private HeightRepo heightRepo;
 	
-	private double step;
+	private float step;
 	private int precision;
 	private Coordinate coordinateStart;
 	private Coordinate coordinateEnd;
@@ -29,7 +29,7 @@ public class Tile {
 		this.coordinateStart = coordinateStart;
 		this.coordinateEnd = coordinateEnd;
 		this.precision = 3;
-		this.step = 0.001;
+		this.step = 0.001f;
 		externalPrecision = this.precision;
 	}
 	
@@ -38,7 +38,7 @@ public class Tile {
 		this.coordinateEnd = coordinateEnd;
 		this.precision = precision;
 		this.heightRepo = heightRepo;
-		this.step = 1 / Math.pow(10, precision);
+		this.step = (float) (1 / Math.pow(10, precision));
 		externalPrecision = this.precision;
 	}
 	
@@ -206,8 +206,12 @@ public class Tile {
 		}
 	}
 	
-	private double customRound(double num) {
-		return new BigDecimal(num).setScale(precision, RoundingMode.HALF_UP).doubleValue();
+	private float customRound(float num) {
+		return new BigDecimal(num).setScale(precision, RoundingMode.HALF_UP).floatValue();
+	}
+
+	private float customRound(double num) {
+		return new BigDecimal(num).setScale(precision, RoundingMode.HALF_UP).floatValue();
 	}
 	
 	/**

@@ -1,19 +1,19 @@
 package com.brovko.maps.component;
 
 public class Coordinate {
-	private double latitude;
-	private double longitude;
+	private float latitude;
+	private float longitude;
 	
-	public Coordinate(double latitude, double longitude) {
+	public Coordinate(float latitude, float longitude) {
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
 	
-	public double getLatitude() {
+	public float getLatitude() {
 		return latitude;
 	}
 	
-	public double getLongitude() {
+	public float getLongitude() {
 		return longitude;
 	}
 	
