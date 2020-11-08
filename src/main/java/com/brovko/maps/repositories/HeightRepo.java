@@ -11,10 +11,11 @@ import java.util.List;
 
 @Repository
 public interface HeightRepo extends CrudRepository<Height, HeightPK> {
-	
-	@Query("SELECT a FROM Height a WHERE a.latitude=:latitude and a.longitude=:longitude")
-	List<Height> fetchHeight(@Param("latitude") double latitude, @Param("longitude") double longitude);
-	
+
+	Height findHeightByLatitudeAndLongitude(
+		@Param("latitude") float latitude,
+		@Param("longitude") float longitude
+	);
 	
 	@Query("SELECT a FROM Height a WHERE a.latitude >= :latitudeStart and a.latitude <= :latitudeEnd and a.longitude >= :longitudeStart and a.longitude <= :longitudeEnd")
 	List<Height> fetchTile(

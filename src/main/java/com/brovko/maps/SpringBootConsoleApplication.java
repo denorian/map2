@@ -32,7 +32,7 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 		
 		long start2 = System.currentTimeMillis();
 		
-		Parser parser = new Parser(heightRepo,0.1f, 2);
+		Parser parser = new Parser(heightRepo,0.01f, 2);
 		parser.run();
 		
 		System.out.println(System.currentTimeMillis() - start + " ms");

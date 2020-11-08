@@ -26,9 +26,8 @@ public class Parser {
 	}
 
 	public void run() throws InterruptedException {
-		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(120);
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(90);
 
-		int counter = 0;
 		for (float i = LATITUDE_START; i > LATITUDE_END; i -= step) {
 			for (float j = LONGITUDE_START; j < LONGITUDE_END; j += step) {
 
