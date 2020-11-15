@@ -13,6 +13,7 @@ public class First {
 		stringBuilder.append(latitude);
 		stringBuilder.append("&lon=");
 		stringBuilder.append(longitude);
+		stringBuilder.append("&lcs=nlcd,nlcdcanopy,corine,saland");
 		return stringBuilder.toString();
 	}
 	

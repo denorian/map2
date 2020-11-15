@@ -31,7 +31,7 @@ public class Parser {
 	}
 
 	public void run() throws InterruptedException {
-		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(100	);
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(200	);
 
 		int speed = 0;
 		for (float i = LATITUDE_START; i > LATITUDE_END; i -= step) {
@@ -60,7 +60,7 @@ public class Parser {
 					return null;
 				});
 
-				if (executor.getQueue().size() > 10000) {
+				if (executor.getQueue().size() > 20000) {
 					System.out.println("lat=" + finalI + " lon=" + finalJ);
 					System.out.println("speed=" + speed);
 					speed = 0;
