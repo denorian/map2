@@ -14,6 +14,7 @@ import static java.lang.System.exit;
 
 @SpringBootApplication
 public class SpringBootConsoleApplication implements CommandLineRunner {
+
 	@Autowired
 	public HeightRepo heightRepo;
 	

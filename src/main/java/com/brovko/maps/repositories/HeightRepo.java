@@ -16,7 +16,11 @@ public interface HeightRepo extends CrudRepository<Height, HeightPK> {
 		@Param("latitude") float latitude,
 		@Param("longitude") float longitude
 	);
-	
+
+	List<Height> findHeightsByLatitude(
+		@Param("latitude") float latitude
+	);
+
 	@Query("SELECT a FROM Height a WHERE a.latitude >= :latitudeStart and a.latitude <= :latitudeEnd and a.longitude >= :longitudeStart and a.longitude <= :longitudeEnd")
 	List<Height> fetchTile(
 			@Param("latitudeStart") double latitudeStart,
