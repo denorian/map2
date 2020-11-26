@@ -17,7 +17,7 @@ public class Parser {
 
 	public static final int LONGITUDE_START = -180;
 	public static final int LONGITUDE_END = 180;
-	public static final int LATITUDE_START = 68;
+	public static final int LATITUDE_START = 67;
 	public static final int LATITUDE_END = -54;
 
 	private float step;
@@ -36,7 +36,9 @@ public class Parser {
 		int speed = 0;
 		for (float i = LATITUDE_START; i > LATITUDE_END; i -= step) {
 
-			Map<Float, Height> lineLatitudeMap = heightRepo.findHeightsByLatitude(i)
+			float finalI = customRound(i);
+
+			Map<Float, Height> lineLatitudeMap = heightRepo.findHeightsByLatitude(finalI)
 				.stream()
 				.collect(Collectors.toMap(
 					Height::getLongitude,
@@ -46,21 +48,19 @@ public class Parser {
 
 			for (float j = LONGITUDE_START; j < LONGITUDE_END; j += step) {
 				speed++;
+				float finalJ = customRound(j);
 
-				if(lineLatitudeMap.containsKey(j)) {
-					System.out.println("continue");
+				if(lineLatitudeMap.containsKey(finalJ)) {
 					continue;
 				}
 
-				float finalI = customRound(i);
-				float finalJ = customRound(j);
 
 				executor.submit(() -> {
 					new HeightComponent(heightRepo).getHeight(finalI, finalJ);
 					return null;
 				});
 
-				if (executor.getQueue().size() > 20000) {
+				if (executor.getQueue().size() > 40000) {
 					System.out.println("lat=" + finalI + " lon=" + finalJ);
 					System.out.println("speed=" + speed);
 					speed = 0;
