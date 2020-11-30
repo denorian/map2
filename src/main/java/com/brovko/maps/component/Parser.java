@@ -1,8 +1,5 @@
 package com.brovko.maps.component;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -12,33 +9,45 @@ import java.util.stream.Collectors;
 
 import com.brovko.maps.model.Height;
 import com.brovko.maps.repositories.HeightRepo;
+import com.brovko.maps.services.HeightService;
+import com.brovko.maps.utils.RoundUtil;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
+@Service
 public class Parser {
 
-	public static final int LONGITUDE_START = -180;
-	public static final int LONGITUDE_END = 180;
-	public static final int LATITUDE_START = 67;
+	public static final int LONGITUDE_START = -125;
+	public static final int LONGITUDE_END = 145;
+	public static final int LATITUDE_START = 64;
 	public static final int LATITUDE_END = -54;
 
+	@Value("${parser.step}")
 	private float step;
-	private int precision;
+	@Autowired
 	private HeightRepo heightRepo;
-
-	public Parser(HeightRepo heightRepo, float step, int precision) {
-		this.step = step;
-		this.precision = precision;
-		this.heightRepo = heightRepo;
-	}
+	@Autowired
+	private HeightService service;
+	@Autowired
+	private RoundUtil roundUtil;
 
 	public void run() throws InterruptedException {
-		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(200	);
+		ThreadPoolExecutor heyWhatsThatPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(100);
+		ThreadPoolExecutor floodMapPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(100);
+		ThreadPoolExecutor voteToVidPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(100);
 
-		int speed = 0;
+		int totalSpeed = 0;
+		int heySpeed = 0;
+		int floodSpeed = 0;
+		int voteSpeed = 0;
 		for (float i = LATITUDE_START; i > LATITUDE_END; i -= step) {
 
-			float finalI = customRound(i);
+			float finalLatitude = roundUtil.customRound(i);
 
-			Map<Float, Height> lineLatitudeMap = heightRepo.findHeightsByLatitude(finalI)
+			Map<Float, Height> lineLatitudeMap = heightRepo.findHeightsByLatitude(finalLatitude)
 				.stream()
 				.collect(Collectors.toMap(
 					Height::getLongitude,
@@ -47,36 +56,53 @@ public class Parser {
 				));
 
 			for (float j = LONGITUDE_START; j < LONGITUDE_END; j += step) {
-				speed++;
-				float finalJ = customRound(j);
 
-				if(lineLatitudeMap.containsKey(finalJ)) {
+				totalSpeed++;
+
+				float finalLongitude = roundUtil.customRound(j);
+
+				if (lineLatitudeMap.containsKey(finalLongitude)) {
 					continue;
 				}
 
-
-				executor.submit(() -> {
-					new HeightComponent(heightRepo).getHeight(finalI, finalJ);
-					return null;
-				});
-
-				if (executor.getQueue().size() > 40000) {
-					System.out.println("lat=" + finalI + " lon=" + finalJ);
-					System.out.println("speed=" + speed);
-					speed = 0;
+				if (voteToVidPool.getQueue().size() < 10000){
+					voteSpeed++;
+					voteToVidPool.submit(() -> {
+						Height height = service.getHeightVoteToVid(finalLatitude, finalLongitude);
+						return null;
+					});
+				}
+				 else if (floodMapPool.getQueue().size() < 10000){
+					floodSpeed++;
+					floodMapPool.submit(() -> {
+						Height height = service.getHeightFloodMap(finalLatitude, finalLongitude);
+						return null;
+					});
+				} else if (heyWhatsThatPool.getQueue().size() < 10000) {
+					heySpeed++;
+					heyWhatsThatPool.submit(() -> {
+						Height height = service.getHeight(finalLatitude, finalLongitude);
+						return null;
+					});
+				} else {
+					System.out.println("lat=" + finalLatitude + " lon=" + finalLongitude);
+					System.out.println("totalSpeed=" + totalSpeed);
+					System.out.println("heySpeed=" + heySpeed);
+					System.out.println("floodSpeed=" + floodSpeed);
+					System.out.println("voteSpeed=" + voteSpeed);
+					totalSpeed = 0;
+					heySpeed = 0;
+					floodSpeed = 0;
+					voteSpeed = 0;
 					Thread.sleep(1000);
 				}
 			}
 		}
 
-		executor.shutdown();
+		heyWhatsThatPool.shutdown();
 		System.out.println("shutdown");
-		while (!executor.awaitTermination(24L, TimeUnit.HOURS)) {
+		while (!heyWhatsThatPool.awaitTermination(24L, TimeUnit.HOURS)) {
 			System.out.println("Not yet. Still waiting for termination");
 		}
-	}
-
-	private float customRound(float num) {
-		return new BigDecimal(num).setScale(precision, RoundingMode.HALF_UP).floatValue();
 	}
 }

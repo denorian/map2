@@ -33,7 +33,7 @@ public class SimpleHttpClient {
 			}
 			
 		} catch (Exception cause) {
-			cause.printStackTrace();
+		//	cause.printStackTrace();
 		} finally {
 			if (connection != null) {
 				connection.disconnect();

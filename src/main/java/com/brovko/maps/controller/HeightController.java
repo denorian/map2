@@ -1,21 +1,23 @@
 package com.brovko.maps.controller;
 
-import com.brovko.maps.component.HeightComponent;
 import com.brovko.maps.model.Height;
-import com.brovko.maps.repositories.HeightRepo;
+import com.brovko.maps.services.HeightService;
+import com.brovko.maps.utils.RoundUtil;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 @RestController
 @RequestMapping("/api")
+@AllArgsConstructor
 public class HeightController {
+
 	@Autowired
-	private HeightRepo heightRepo;
+	private RoundUtil roundUtil;
+	@Autowired
+	private HeightService service;
 
 	@RequestMapping(value = "/get-height/", method = RequestMethod.GET)
 	public ResponseEntity<Height> getHeight(
@@ -24,18 +26,13 @@ public class HeightController {
 	) {
 		float latitude, longitude;
 		try {
-			latitude = new BigDecimal(Double.parseDouble(latitudeString))
-					.setScale(Height.PRECISION, RoundingMode.UP)
-					.floatValue();
-			
-			longitude = new BigDecimal(Double.parseDouble(longitudeSting))
-					.setScale(Height.PRECISION, RoundingMode.UP)
-					.floatValue();
+			latitude = roundUtil.customRound(Float.parseFloat(latitudeString));
+			longitude = roundUtil.customRound(Float.parseFloat(longitudeSting));
 		} catch (Exception e) {
 			return new ResponseEntity(HttpStatus.BAD_REQUEST);
 		}
 
-		Height height = new HeightComponent(heightRepo).getHeight(latitude, longitude);
+		Height height = service.getHeight(latitude, longitude);
 		
 		return new ResponseEntity(height, HttpStatus.OK);
 	}

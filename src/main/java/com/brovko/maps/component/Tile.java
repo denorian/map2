@@ -1,10 +1,7 @@
 package com.brovko.maps.component;
 
-import com.brovko.maps.component.workers.HeightWorkerThread;
 import com.brovko.maps.model.Height;
 import com.brovko.maps.repositories.HeightRepo;
-
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.*;
@@ -71,7 +68,7 @@ public class Tile {
 			Coordinate coordinate = iterator.next();
 			mapKey = coordinate.getMapKey();
 			
-			if (heightHashMap.containsKey(mapKey)) {
+		/*	if (heightHashMap.containsKey(mapKey)) {
 				heightLinkedList.add(heightHashMap.get(mapKey));
 			} else {
 				try {
@@ -83,7 +80,7 @@ public class Tile {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			}
+			}*/
 		}
 		
 		try {

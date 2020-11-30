@@ -17,6 +17,8 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 
 	@Autowired
 	public HeightRepo heightRepo;
+	@Autowired
+	public Parser parser;
 	
 	public static long start = System.currentTimeMillis();
 	
@@ -32,8 +34,7 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		
 		long start2 = System.currentTimeMillis();
-		
-		Parser parser = new Parser(heightRepo,0.01f, 2);
+
 		parser.run();
 		
 		System.out.println(System.currentTimeMillis() - start + " ms");
