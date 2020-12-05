@@ -2,6 +2,7 @@ package com.brovko.maps.services;
 
 import com.brovko.maps.model.Height;
 import com.brovko.maps.repositories.HeightRepo;
+import com.brovko.maps.services.iface.ExternalService;
 import com.brovko.maps.services.impl.FloodMap;
 import com.brovko.maps.services.impl.HeyWhatsThat;
 import com.brovko.maps.services.impl.VoteToVid;
@@ -23,45 +24,17 @@ public class HeightService {
 	private VoteToVid voteToVid;
 
 	public Height getHeight( float latitude, float longitude){
-		Height height = heightRepo.findHeightByLatitudeAndLongitude(latitude, longitude);
-
-		if (height == null) {
-			height = new Height(
-				latitude,
-				longitude,
-				heyWhatsThat.getHeight(latitude, longitude)
-			);
-
-			heightRepo.save(height);
-		}
-
-		return height;
+		return heightRepo.findHeightByLatitudeAndLongitude(latitude, longitude);
 	}
 
-	public Height getHeightFloodMap( float latitude, float longitude){
+	public Height getHeightWithExternalService(float latitude, float longitude, ExternalService externalService){
 		Height height = heightRepo.findHeightByLatitudeAndLongitude(latitude, longitude);
 
 		if (height == null) {
 			height = new Height(
 				latitude,
 				longitude,
-				floodMap.getHeight(latitude, longitude)
-			);
-
-			heightRepo.save(height);
-		}
-
-		return height;
-	}
-
-	public Height getHeightVoteToVid( float latitude, float longitude){
-		Height height = heightRepo.findHeightByLatitudeAndLongitude(latitude, longitude);
-
-		if (height == null) {
-			height = new Height(
-				latitude,
-				longitude,
-				voteToVid.getHeight(latitude, longitude)
+				externalService.getHeight(latitude, longitude)
 			);
 
 			heightRepo.save(height);

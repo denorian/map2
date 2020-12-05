@@ -1,0 +1,13 @@
+{
+  "properties": [
+    {
+      "name": "parser.step",
+      "type": "java.lang.String",
+      "description": "Description for parser.step."
+    },
+    {
+      "name": "parser.precision",
+      "type": "java.lang.String",
+      "description": "Description for parser.precision."
+    }
+  ] }

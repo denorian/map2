@@ -6,6 +6,11 @@ import org.springframework.stereotype.Service;
 public class VoteToVid extends AbstractExternalService {
 
 	@Override
+	public int getThreadCount() {
+		return 1;
+	}
+
+	@Override
 	public String buildQuery(float latitude, float longitude) {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("https://votetovid.ru/hgt/");

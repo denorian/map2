@@ -62,4 +62,9 @@ public class Topocoding extends AbstractExternalService {
 	public short parseResponce(String response) {
 		return 0;
 	}
+
+	@Override
+	public int getThreadCount() {
+		return 1;
+	}
 }

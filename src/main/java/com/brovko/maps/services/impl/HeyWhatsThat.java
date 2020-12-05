@@ -6,6 +6,11 @@ import org.springframework.stereotype.Service;
 public class HeyWhatsThat extends AbstractExternalService {
 
 	@Override
+	public int getThreadCount() {
+		return 96;
+	}
+
+	@Override
 	public String buildQuery(float latitude, float longitude) {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("http://www.heywhatsthat.com/bin/elev-landcover.cgi");

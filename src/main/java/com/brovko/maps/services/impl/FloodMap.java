@@ -7,6 +7,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class FloodMap extends AbstractExternalService {
 
+	@Override
+	public int getThreadCount() {
+		return 144;
+	}
+
 	public String buildQuery(float latitude, float longitude) {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("https://www.floodmap.net/pro/elevationmap/getelevation.ashx");

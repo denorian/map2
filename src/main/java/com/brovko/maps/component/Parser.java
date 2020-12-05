@@ -1,5 +1,6 @@
 package com.brovko.maps.component;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -10,10 +11,11 @@ import java.util.stream.Collectors;
 import com.brovko.maps.model.Height;
 import com.brovko.maps.repositories.HeightRepo;
 import com.brovko.maps.services.HeightService;
+import com.brovko.maps.services.iface.ExternalService;
+import com.brovko.maps.services.impl.FloodMap;
+import com.brovko.maps.services.impl.HeyWhatsThat;
+import com.brovko.maps.services.impl.VoteToVid;
 import com.brovko.maps.utils.RoundUtil;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -22,27 +24,38 @@ public class Parser {
 
 	public static final int LONGITUDE_START = -125;
 	public static final int LONGITUDE_END = 145;
-	public static final int LATITUDE_START = 66;
+	public static final int LATITUDE_START = 58;
 	public static final int LATITUDE_END = -54;
 
-	@Value("${parser.step}")
 	private float step;
-	@Autowired
+	private int skipCount;
+
 	private HeightRepo heightRepo;
-	@Autowired
 	private HeightService service;
-	@Autowired
 	private RoundUtil roundUtil;
+	private Map<ExternalService,ThreadPoolExecutor> externalServiceMap = new HashMap();
+	private Map<ExternalService, Long> statisticMap = new HashMap();
+
+	public Parser(
+		HeightRepo heightRepo,
+		HeightService service,
+		RoundUtil roundUtil,
+		HeyWhatsThat heyWhatsThat,
+		FloodMap floodMap,
+		VoteToVid voteToVid,
+		@Value("${parser.step}") float step
+	) {
+		this.heightRepo = heightRepo;
+		this.service = service;
+		this.roundUtil = roundUtil;
+		this.step = step;
+
+		initExternalService(heyWhatsThat);
+		initExternalService(floodMap);
+		initExternalService(voteToVid);
+	}
 
 	public void run() throws InterruptedException {
-		ThreadPoolExecutor heyWhatsThatPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(100);
-		ThreadPoolExecutor floodMapPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(128);
-		ThreadPoolExecutor voteToVidPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
-
-		int totalSpeed = 0;
-		int heySpeed = 0;
-		int floodSpeed = 0;
-		int voteSpeed = 0;
 		for (float i = LATITUDE_START; i > LATITUDE_END; i -= step) {
 
 			float finalLatitude = roundUtil.customRound(i);
@@ -56,53 +69,87 @@ public class Parser {
 				));
 
 			for (float j = LONGITUDE_START; j < LONGITUDE_END; j += step) {
-
-				totalSpeed++;
-
 				float finalLongitude = roundUtil.customRound(j);
 
 				if (lineLatitudeMap.containsKey(finalLongitude)) {
+					skipCount++;
 					continue;
 				}
 
-				if (heyWhatsThatPool.getQueue().size() < 10000) {
-					heySpeed++;
-					heyWhatsThatPool.submit(() -> {
-						Height height = service.getHeight(finalLatitude, finalLongitude);
+				ExternalService es = getMinQueueExternalService();
+
+				ThreadPoolExecutor minThreadPoolExecutor = externalServiceMap.get(es);
+
+				if (minThreadPoolExecutor.getQueue().size() < 10000) {
+					minThreadPoolExecutor.submit(() -> {
+						service.getHeightWithExternalService(finalLatitude, finalLongitude, es);
 						return null;
 					});
-				}
-				 else if (floodMapPool.getQueue().size() < 10000){
-					floodSpeed++;
-					floodMapPool.submit(() -> {
-						Height height = service.getHeightFloodMap(finalLatitude, finalLongitude);
-						return null;
-					});
-				} else if(voteToVidPool.getQueue().size() < 10000){
-					voteSpeed++;
-					voteToVidPool.submit(() -> {
-						Height height = service.getHeightVoteToVid(finalLatitude, finalLongitude);
-						return null;
-					});
-				}  else {
-					System.out.println("lat=" + finalLatitude + " lon=" + finalLongitude);
-					System.out.println("totalSpeed=" + totalSpeed);
-					System.out.println("heySpeed=" + heySpeed);
-					System.out.println("floodSpeed=" + floodSpeed);
-					System.out.println("voteSpeed=" + voteSpeed);
-					totalSpeed = 0;
-					heySpeed = 0;
-					floodSpeed = 0;
-					voteSpeed = 0;
-					Thread.sleep(3000);
+				} else {
+					System.out.println("lat = " + finalLatitude + " lon = " + finalLongitude);
+					printStatistic();
+					Thread.sleep(1000);
 				}
 			}
 		}
 
-		heyWhatsThatPool.shutdown();
 		System.out.println("shutdown");
-		while (!heyWhatsThatPool.awaitTermination(24L, TimeUnit.HOURS)) {
-			System.out.println("Not yet. Still waiting for termination");
+
+		externalServiceMap.values().forEach(
+			threadPoolExecutor -> {
+				threadPoolExecutor.shutdown();
+				try {
+					threadPoolExecutor.awaitTermination(24L, TimeUnit.HOURS);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		);
+	}
+
+	private void initExternalService(ExternalService externalService){
+		if(externalService != null){
+			externalServiceMap.put(
+				externalService,
+				(ThreadPoolExecutor) Executors.newFixedThreadPool(externalService.getThreadCount())
+			);
+		}
+	}
+
+	private ExternalService getMinQueueExternalService(){
+		int min = Integer.MAX_VALUE;
+		ExternalService resExtService = null;
+		for (Map.Entry<ExternalService, ThreadPoolExecutor> pair : externalServiceMap.entrySet()) {
+			int poolSize = pair.getValue().getQueue().size();
+
+			if(poolSize < min ){
+				min = poolSize;
+				resExtService = pair.getKey();
+			}
+		}
+
+		return resExtService;
+	}
+
+	private void printStatistic(){
+		System.out.println("skipCount = " + skipCount);
+		skipCount = 0;
+
+		if (statisticMap.isEmpty()) {
+			externalServiceMap.forEach(
+				(es, pool) -> {
+					statisticMap.put(es, pool.getCompletedTaskCount());
+				}
+			);
+		} else {
+			externalServiceMap.forEach(
+				(es, pool) -> {
+					System.out.println(
+						es.getClass().getSimpleName() + " = " + (pool.getCompletedTaskCount() - statisticMap.get(es))
+					);
+					statisticMap.put(es, pool.getCompletedTaskCount());
+				}
+			);
 		}
 	}
 }
