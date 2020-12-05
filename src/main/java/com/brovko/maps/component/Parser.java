@@ -22,7 +22,7 @@ public class Parser {
 
 	public static final int LONGITUDE_START = -125;
 	public static final int LONGITUDE_END = 145;
-	public static final int LATITUDE_START = 64;
+	public static final int LATITUDE_START = 66;
 	public static final int LATITUDE_END = -54;
 
 	@Value("${parser.step}")
@@ -36,8 +36,8 @@ public class Parser {
 
 	public void run() throws InterruptedException {
 		ThreadPoolExecutor heyWhatsThatPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(100);
-		ThreadPoolExecutor floodMapPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(100);
-		ThreadPoolExecutor voteToVidPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(100);
+		ThreadPoolExecutor floodMapPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(128);
+		ThreadPoolExecutor voteToVidPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
 
 		int totalSpeed = 0;
 		int heySpeed = 0;
@@ -65,10 +65,10 @@ public class Parser {
 					continue;
 				}
 
-				if (voteToVidPool.getQueue().size() < 10000){
-					voteSpeed++;
-					voteToVidPool.submit(() -> {
-						Height height = service.getHeightVoteToVid(finalLatitude, finalLongitude);
+				if (heyWhatsThatPool.getQueue().size() < 10000) {
+					heySpeed++;
+					heyWhatsThatPool.submit(() -> {
+						Height height = service.getHeight(finalLatitude, finalLongitude);
 						return null;
 					});
 				}
@@ -78,13 +78,13 @@ public class Parser {
 						Height height = service.getHeightFloodMap(finalLatitude, finalLongitude);
 						return null;
 					});
-				} else if (heyWhatsThatPool.getQueue().size() < 10000) {
-					heySpeed++;
-					heyWhatsThatPool.submit(() -> {
-						Height height = service.getHeight(finalLatitude, finalLongitude);
+				} else if(voteToVidPool.getQueue().size() < 10000){
+					voteSpeed++;
+					voteToVidPool.submit(() -> {
+						Height height = service.getHeightVoteToVid(finalLatitude, finalLongitude);
 						return null;
 					});
-				} else {
+				}  else {
 					System.out.println("lat=" + finalLatitude + " lon=" + finalLongitude);
 					System.out.println("totalSpeed=" + totalSpeed);
 					System.out.println("heySpeed=" + heySpeed);
@@ -94,7 +94,7 @@ public class Parser {
 					heySpeed = 0;
 					floodSpeed = 0;
 					voteSpeed = 0;
-					Thread.sleep(1000);
+					Thread.sleep(3000);
 				}
 			}
 		}

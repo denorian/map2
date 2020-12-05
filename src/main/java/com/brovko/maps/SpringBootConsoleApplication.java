@@ -4,6 +4,7 @@ import com.brovko.maps.component.Coordinate;
 import com.brovko.maps.component.Parser;
 import com.brovko.maps.component.Tile;
 import com.brovko.maps.repositories.HeightRepo;
+import com.brovko.maps.services.impl.Topocoding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
 import org.springframework.boot.CommandLineRunner;
@@ -19,6 +20,8 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 	public HeightRepo heightRepo;
 	@Autowired
 	public Parser parser;
+	@Autowired
+	public Topocoding topocoding;
 	
 	public static long start = System.currentTimeMillis();
 	
@@ -36,7 +39,8 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 		long start2 = System.currentTimeMillis();
 
 		parser.run();
-		
+		//int res = topocoding.getHeight(50.40672624325773f, 16.752807617187518f);
+
 		System.out.println(System.currentTimeMillis() - start + " ms");
 		System.out.println(System.currentTimeMillis() - start2 + " ms");
 		

@@ -17,6 +17,7 @@ public class SimpleHttpClient {
 			connection.setUseCaches(false);
 			connection.setConnectTimeout(600000);
 			connection.setReadTimeout(600000);
+
 			connection.connect();
 			
 			StringBuilder stringBuilder = new StringBuilder();
