@@ -43,6 +43,7 @@ public class Parser {
 		VoteToVid voteToVid,
 		Topocoding topocoding,
 		CalcMaps calcMaps,
+		FreeMapTools freeMapTools,
 		@Value("${parser.step}") float step
 	) {
 		this.heightRepo = heightRepo;
@@ -53,7 +54,7 @@ public class Parser {
 		initExternalService(heyWhatsThat);
 		initExternalService(floodMap);
 		initExternalService(calcMaps);
-	//	initExternalService(voteToVid);
+		initExternalService(freeMapTools);
 	}
 
 	public void run() throws InterruptedException {

@@ -23,7 +23,7 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 	@Autowired
 	public Parser parser;
 	@Autowired
-	public CalcMaps calcMaps;
+	public FreeMapTools calcMaps;
 	
 	public static long start = System.currentTimeMillis();
 	
@@ -44,7 +44,7 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 	public void run1(String... args) throws Exception {
 		
 		long start2 = System.currentTimeMillis();
-		calcMaps.getHeight(42.480152f, 21.042968f);
+		calcMaps.getHeight(7.719f, 19.688f);
 		System.out.println(System.currentTimeMillis() - start2 + " ms");
 
 		

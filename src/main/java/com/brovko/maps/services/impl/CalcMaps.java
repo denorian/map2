@@ -1,6 +1,5 @@
 package com.brovko.maps.services.impl;
 
-import com.brovko.maps.services.SimpleHttpClient;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,7 @@ public class CalcMaps extends AbstractExternalService {
 
 	@Override
 	public int getThreadCount() {
-		return 4;
+		return 8;
 	}
 
 	public String buildQuery(float latitude, float longitude) {
