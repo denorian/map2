@@ -2,11 +2,76 @@ package com.brovko.maps.services.impl;
 
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 @Service
 public class Topocoding extends AbstractExternalService {
-	String topoUrlChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.!*()";
-	int topoUrlCharsLength = topoUrlChars.length();
-	int topoUrlCharsSqrt = (int) Math.floor(Math.sqrt(topoUrlCharsLength));
+	private String topoUrlChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.!*()";
+	private int topoUrlCharsLength = topoUrlChars.length();
+	private int topoUrlCharsSqrt = (int) Math.floor(Math.sqrt(topoUrlCharsLength));
+
+	@Override
+	public short getHeight(float latitude, float longitude) {
+		String url = buildQuery(latitude, longitude);
+		String reponse = request(url);
+		short height = parseResponce(reponse);
+
+		if (height > ERROR_VALUE) {
+			return height;
+		}
+
+		return ERROR_VALUE;
+
+	}
+
+	public String request(String url){
+
+		String response = "";
+		HttpURLConnection connection = null;
+		try {
+			connection = (HttpURLConnection) new URL(url).openConnection();
+			connection.setRequestMethod("GET");
+			connection.setUseCaches(false);
+			connection.setConnectTimeout(600000);
+			connection.setReadTimeout(600000);
+
+			connection.setRequestProperty("Host", "topocoding.com");
+			connection.setRequestProperty("Connection", "keep-alive");
+			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36");
+			connection.setRequestProperty("Accept", "*/*");
+			connection.setRequestProperty("Referer", "http://topocoding.com/demo/google.html");
+		//	connection.setRequestProperty("Accept-Encoding", "gzip, deflate");
+			connection.setRequestProperty("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
+
+			connection.connect();
+
+			StringBuilder stringBuilder = new StringBuilder();
+			if (HttpURLConnection.HTTP_OK == connection.getResponseCode()) {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+				String line;
+				while ((line = reader.readLine()) != null) {
+					stringBuilder.append(line);
+					stringBuilder.append("\n");
+				}
+				response = stringBuilder.toString();
+				reader.close();
+			}
+
+		} catch (Exception cause) {
+			//	cause.printStackTrace();
+		} finally {
+			if (connection != null) {
+				connection.disconnect();
+			}
+		}
+
+		return response;
+	}
+
 
 	@Override
 	public String buildQuery(float latitude, float longitude) {

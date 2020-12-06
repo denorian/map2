@@ -12,9 +12,7 @@ import com.brovko.maps.model.Height;
 import com.brovko.maps.repositories.HeightRepo;
 import com.brovko.maps.services.HeightService;
 import com.brovko.maps.services.iface.ExternalService;
-import com.brovko.maps.services.impl.FloodMap;
-import com.brovko.maps.services.impl.HeyWhatsThat;
-import com.brovko.maps.services.impl.VoteToVid;
+import com.brovko.maps.services.impl.*;
 import com.brovko.maps.utils.RoundUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -43,6 +41,8 @@ public class Parser {
 		HeyWhatsThat heyWhatsThat,
 		FloodMap floodMap,
 		VoteToVid voteToVid,
+		Topocoding topocoding,
+		CalcMaps calcMaps,
 		@Value("${parser.step}") float step
 	) {
 		this.heightRepo = heightRepo;
@@ -52,7 +52,8 @@ public class Parser {
 
 		initExternalService(heyWhatsThat);
 		initExternalService(floodMap);
-		initExternalService(voteToVid);
+		initExternalService(calcMaps);
+	//	initExternalService(voteToVid);
 	}
 
 	public void run() throws InterruptedException {

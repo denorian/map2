@@ -4,6 +4,9 @@ import com.brovko.maps.component.Coordinate;
 import com.brovko.maps.component.Parser;
 import com.brovko.maps.component.Tile;
 import com.brovko.maps.repositories.HeightRepo;
+import com.brovko.maps.services.impl.CalcMaps;
+import com.brovko.maps.services.impl.FreeMapTools;
+import com.brovko.maps.services.impl.Topocoding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
 import org.springframework.boot.CommandLineRunner;
@@ -19,6 +22,8 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 	public HeightRepo heightRepo;
 	@Autowired
 	public Parser parser;
+	@Autowired
+	public CalcMaps calcMaps;
 	
 	public static long start = System.currentTimeMillis();
 	
@@ -29,34 +34,35 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 		app.run(args);
 		
 	}
-	
-	@Override
+
 	public void run(String... args) throws Exception {
-		
-		long start2 = System.currentTimeMillis();
-
 		parser.run();
-
 		System.out.println(System.currentTimeMillis() - start + " ms");
-		System.out.println(System.currentTimeMillis() - start2 + " ms");
-		
 		exit(0);
 	}
 	
-	public void run2(String... args) throws Exception {
+	public void run1(String... args) throws Exception {
 		
 		long start2 = System.currentTimeMillis();
-		System.out.println(heightRepo);
+		calcMaps.getHeight(42.480152f, 21.042968f);
+		System.out.println(System.currentTimeMillis() - start2 + " ms");
+
+		
+		exit(0);
+	}
+	public void run2(String... args) throws Exception {
+
+		long start2 = System.currentTimeMillis();
 		Coordinate coordinateStart = new Coordinate(44.408168f, 38.503053f);
 		Coordinate coordinateEnd = new Coordinate(44.351066f, 38.559055f);
-		
+
 		Tile tile = new Tile(coordinateStart, coordinateEnd, 4, heightRepo);
 		tile.drawConsoleMatrix(10);
-		
+
 		//System.out.println();
 		System.out.println(System.currentTimeMillis() - start + " ms");
 		System.out.println(System.currentTimeMillis() - start2 + " ms");
-		
+
 		exit(0);
 	}
 }

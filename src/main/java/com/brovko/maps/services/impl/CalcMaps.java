@@ -1,5 +1,8 @@
 package com.brovko.maps.services.impl;
 
+import com.brovko.maps.services.SimpleHttpClient;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -8,41 +11,31 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Service
-public class VoteToVid extends AbstractExternalService {
+public class CalcMaps extends AbstractExternalService {
 
 	@Override
 	public int getThreadCount() {
-		return 1;
+		return 4;
 	}
 
-	@Override
+	public String buildQuery(float latitude, float longitude) {
+		StringBuilder stringBuilder = new StringBuilder();
+
+		stringBuilder.append("https://www.calcmaps.com/ajax.php?op=elevation");
+		stringBuilder.append("&lat=");
+		stringBuilder.append(latitude);
+		stringBuilder.append("&lng=");
+		stringBuilder.append(longitude);
+		stringBuilder.append("&_=1607234011926");
+
+		return stringBuilder.toString();
+	}
+
 	public short getHeight(float latitude, float longitude) {
 		String url = buildQuery(latitude, longitude);
 		String reponse = request(url);
 		short height = parseResponce(reponse);
 
-		if (height > ERROR_VALUE) {
-			return height;
-		}
-
-		return ERROR_VALUE;
-	}
-
-	@Override
-	public String buildQuery(float latitude, float longitude) {
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("https://votetovid.ru/hgt/");
-		stringBuilder.append(latitude);
-		stringBuilder.append(",");
-		stringBuilder.append(longitude);
-		stringBuilder.append("/");
-
-		return stringBuilder.toString();
-	}
-
-	@Override
-	public short parseResponce(String response) {
-		short height = (short) Math.round(Float.parseFloat(response));
 		if (height > ERROR_VALUE) {
 			return height;
 		}
@@ -61,7 +54,10 @@ public class VoteToVid extends AbstractExternalService {
 			connection.setConnectTimeout(600000);
 			connection.setReadTimeout(600000);
 
-			connection.setRequestProperty("Content-Language", "en-US");
+			connection.setRequestProperty("Host", "www.calcmaps.com");
+			connection.setRequestProperty("Connection", "keep-alive");
+			connection.setRequestProperty("X-Requested-With", "XMLHttpRequest");
+			connection.setRequestProperty("Accept", "*/*");
 
 			connection.connect();
 
@@ -87,5 +83,18 @@ public class VoteToVid extends AbstractExternalService {
 		}
 
 		return response;
+	}
+
+	@Override
+	public short parseResponce(String response) {
+		JSONObject jsonObj = (JSONObject) JSONValue.parse(response);
+		Double value = (Double) jsonObj.get("elevation");
+
+		short height = (short) Math.round(value);
+		if (height > -1) {
+			return height;
+		} else {
+			return 0;
+		}
 	}
 }

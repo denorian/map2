@@ -32,7 +32,7 @@ public class FloodMap extends AbstractExternalService {
 		if (!value.isEmpty()) {
 			short height = Short.parseShort(value);
 			if (height > -1) {
-				return height;
+ 				return height;
 			} else {
 				return 0;
 			}
