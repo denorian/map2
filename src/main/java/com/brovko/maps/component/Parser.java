@@ -22,7 +22,7 @@ public class Parser {
 
 	public static final int LONGITUDE_START = -125;
 	public static final int LONGITUDE_END = 145;
-	public static final int LATITUDE_START = 58;
+	public static final int LATITUDE_START = 54;
 	public static final int LATITUDE_END = -54;
 
 	private float step;
@@ -44,6 +44,7 @@ public class Parser {
 		Topocoding topocoding,
 		CalcMaps calcMaps,
 		FreeMapTools freeMapTools,
+		ElevationApiIO elevationApiIO,
 		@Value("${parser.step}") float step
 	) {
 		this.heightRepo = heightRepo;
@@ -55,6 +56,7 @@ public class Parser {
 		initExternalService(floodMap);
 		initExternalService(calcMaps);
 		initExternalService(freeMapTools);
+		initExternalService(elevationApiIO);
 	}
 
 	public void run() throws InterruptedException {

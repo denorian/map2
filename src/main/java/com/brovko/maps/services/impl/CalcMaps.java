@@ -25,7 +25,8 @@ public class CalcMaps extends AbstractExternalService {
 		stringBuilder.append(latitude);
 		stringBuilder.append("&lng=");
 		stringBuilder.append(longitude);
-		stringBuilder.append("&_=1607234011926");
+		stringBuilder.append("&_=1607289817574");
+		//stringBuilder.append(System.currentTimeMillis());
 
 		return stringBuilder.toString();
 	}

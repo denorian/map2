@@ -11,11 +11,26 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Service
-public class FreeMapTools extends AbstractExternalService {
+public class ElevationApiIO extends AbstractExternalService{
 
 	@Override
 	public int getThreadCount() {
 		return 1;
+	}
+
+	public String buildQuery(float latitude, float longitude) {
+		StringBuilder stringBuilder = new StringBuilder();
+
+		stringBuilder.append("https://elevation-api.io/api/elevation");
+		stringBuilder.append("?key=wB26f6f3z43hiwLDdbRBOyCHcuK2oc");
+		stringBuilder.append("&resolution=90");
+		stringBuilder.append("&points=(");
+		stringBuilder.append(latitude);
+		stringBuilder.append(",");
+		stringBuilder.append(longitude);
+		stringBuilder.append(")");
+
+		return stringBuilder.toString();
 	}
 
 	public short getHeight(float latitude, float longitude) {
@@ -30,7 +45,8 @@ public class FreeMapTools extends AbstractExternalService {
 		return ERROR_VALUE;
 	}
 
-	public String request(String url) {
+	public String request(String url){
+
 		String response = "";
 		HttpURLConnection connection = null;
 		try {
@@ -40,15 +56,14 @@ public class FreeMapTools extends AbstractExternalService {
 			connection.setConnectTimeout(600000);
 			connection.setReadTimeout(600000);
 
-			connection.setRequestProperty("Host", "www.freemaptools.com");
-			connection.setRequestProperty("Connection", "keep-alive");
-			connection.setRequestProperty("Accept", "*/*");
-			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36");
-			connection.setRequestProperty("X-Requested-With", "XMLHttpRequest");
-			connection.setRequestProperty("Sec-Fetch-Site", "same-origin");
-			connection.setRequestProperty("Sec-Fetch-Mode", "cors");
-			connection.setRequestProperty("Sec-Fetch-Dest", "empty");
-			connection.setRequestProperty("Referer", "https://www.freemaptools.com/elevation-finder.htm");
+			connection.setRequestProperty("accept", "*/*");
+			connection.setRequestProperty("accept-language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
+			connection.setRequestProperty("origin", "https://www.daftlogic.com");
+			connection.setRequestProperty("referer", "https://www.daftlogic.com/");
+			connection.setRequestProperty("sec-fetch-dest", "empty");
+			connection.setRequestProperty("sec-fetch-mode", "cors");
+			connection.setRequestProperty("sec-fetch-site", "cross-site");
+			connection.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36");
 
 			connection.connect();
 
@@ -66,7 +81,7 @@ public class FreeMapTools extends AbstractExternalService {
 			}
 
 		} catch (Exception cause) {
-			//	cause.printStackTrace();
+				cause.printStackTrace();
 		} finally {
 			if (connection != null) {
 				connection.disconnect();
@@ -74,18 +89,6 @@ public class FreeMapTools extends AbstractExternalService {
 		}
 
 		return response;
-	}
-
-	@Override
-	public String buildQuery(float latitude, float longitude) {
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("https://www.freemaptools.com/ajax/elevation-service.php");
-		stringBuilder.append("?lat=");
-		stringBuilder.append(latitude);
-		stringBuilder.append("&lng=");
-		stringBuilder.append(longitude);
-
-		return stringBuilder.toString();
 	}
 
 	@Override
