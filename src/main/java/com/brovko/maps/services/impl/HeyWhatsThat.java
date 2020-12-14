@@ -28,7 +28,8 @@ public class HeyWhatsThat extends AbstractExternalService {
 		response = response.replace("\n", "");
 		String[] temp = response.trim().split(" ");
 		if (temp.length > 2) {
-			short height = Short.parseShort(temp[2]);
+			short height = Short.parseShort(temp[2].replaceAll("\\D+",""));
+
 			if (height > ERROR_VALUE) {
 				return height;
 			}

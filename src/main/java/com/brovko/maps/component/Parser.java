@@ -22,7 +22,7 @@ public class Parser {
 
 	public static final int LONGITUDE_START = -125;
 	public static final int LONGITUDE_END = 145;
-	public static final int LATITUDE_START = 54;
+	public static final int LATITUDE_START = 65;
 	public static final int LATITUDE_END = -54;
 
 	private float step;
@@ -56,7 +56,8 @@ public class Parser {
 		initExternalService(floodMap);
 		initExternalService(calcMaps);
 		initExternalService(freeMapTools);
-		initExternalService(elevationApiIO);
+//		initExternalService(elevationApiIO);
+		initExternalService(voteToVid);
 	}
 
 	public void run() throws InterruptedException {
@@ -92,7 +93,7 @@ public class Parser {
 				} else {
 					System.out.println("lat = " + finalLatitude + " lon = " + finalLongitude);
 					printStatistic();
-					Thread.sleep(1000);
+					Thread.sleep(3000);
 				}
 			}
 		}
@@ -124,7 +125,7 @@ public class Parser {
 		int min = Integer.MAX_VALUE;
 		ExternalService resExtService = null;
 		for (Map.Entry<ExternalService, ThreadPoolExecutor> pair : externalServiceMap.entrySet()) {
-			int poolSize = pair.getValue().getQueue().size();
+			int poolSize = pair.getValue().getQueue().size() + pair.getValue().getActiveCount();
 
 			if(poolSize < min ){
 				min = poolSize;

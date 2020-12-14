@@ -15,7 +15,7 @@ public class ElevationApiIO extends AbstractExternalService{
 
 	@Override
 	public int getThreadCount() {
-		return 1;
+		return 8;
 	}
 
 	public String buildQuery(float latitude, float longitude) {

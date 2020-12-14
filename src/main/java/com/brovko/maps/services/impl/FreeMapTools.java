@@ -15,7 +15,7 @@ public class FreeMapTools extends AbstractExternalService {
 
 	@Override
 	public int getThreadCount() {
-		return 1;
+		return 4;
 	}
 
 	public short getHeight(float latitude, float longitude) {
